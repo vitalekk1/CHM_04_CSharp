@@ -9,7 +9,87 @@ namespace ЧисАнМетодЗейделя
 {
     class Program
     {
-        
+        static void Zeidel(int size, double eps, double[,]matrix)
+        {
+            double[] previousVariableValues = new double[size];
+            for (int i = 0; i < size; i++)
+            {
+                previousVariableValues[i] = 0.0;
+            }
+            int count = 0;
+            while (true)
+            {
+                // Введем вектор значений неизвестных на текущем шаге
+                double[] currentVariableValues = new double[size];
+
+                // Посчитаем значения неизвестных на текущей итерации
+                // в соответствии с теоретическими формулами
+                for (int i = 0; i < size; i++)
+                {
+                    // Инициализируем i-ую неизвестную значением
+                    // свободного члена i-ой строки матрицы
+                    currentVariableValues[i] = matrix[i, size];
+
+                    // Вычитаем сумму по всем отличным от i-ой неизвестным
+                    for (int j = 0; j < size; j++)
+                    {
+                        // При j < i можем использовать уже посчитанные
+                        // на этой итерации значения неизвестных
+                        if (j < i)
+                        {
+                            currentVariableValues[i] -= matrix[i,j] * currentVariableValues[j];
+                        }
+
+                        // При j > i используем значения с прошлой итерации
+                        if (j > i)
+                        {
+                            currentVariableValues[i] -= matrix[i, j] * previousVariableValues[j];
+                        }
+                    }
+
+                    // Делим на коэффициент при i-ой неизвестной
+                    currentVariableValues[i] /= matrix[i, i];
+                   
+                    
+                }
+
+                // Посчитаем текущую погрешность относительно предыдущей итерации
+                double error = 0.0;
+
+                for (int i = 0; i < size; i++)
+                {
+                    error += Math.Abs(currentVariableValues[i] - previousVariableValues[i]);
+                }
+
+                // Если необходимая точность достигнута, то завершаем процесс
+                if (error < eps)
+                {
+                    break;
+                }
+               
+                  
+               
+           
+                // Переходим к следующей итерации, так
+                // что текущие значения неизвестны
+                // становятся значениями на предыдущей итерации
+                previousVariableValues = currentVariableValues;
+                count++;
+                Console.WriteLine( count + "я итерация" + "\nОшибка: " + error + "\nРешения системы:");
+                for (int i = 0; i < size; i++)
+                {
+                    
+                    Console.WriteLine("x" + (i + 1) + " " + previousVariableValues[i] + " ");
+                }
+                
+                
+            }
+
+            // Выводим найденные значения неизвестных
+           
+            Console.WriteLine("Общее количество итераций: " + count);
+            
+        }
         static void Main(string[] args)
         {
             
@@ -31,7 +111,8 @@ namespace ЧисАнМетодЗейделя
                 }
                 Console.WriteLine();
             }
-            //Zeidel(size, eps, matrix);
+            Zeidel(size, eps, matrix);
+            Console.ReadLine();
 
            
         }
